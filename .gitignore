@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+.venv/
+
+# Crawl output
+output/
+docs-kb/
+blog-kb/
+spa-kb/
+reddit-kb/
+knowledge-base/
+test_output/
+
+# Config with secrets
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# OMC state
+.omc/
+
+# Playwright
+.cache/ms-playwright/

@@ -1,0 +1,29 @@
+# crawl4ai-cli configuration
+output_dir: ./output
+delay: 1.5
+concurrency: 3
+pruning_threshold: 0.48
+markdown_format: fit         # fit, raw, or citations
+min_word_count: 20           # skip pages with fewer words
+max_retries: 2               # retry on timeout/429/503
+retry_delay: 3.0             # base delay between retries (doubles each attempt)
+
+sites:
+  - url: https://docs.example.com
+    max_depth: 3
+    max_pages: 200
+    css_selector: main       # target main content area
+    wait_until: networkidle  # wait for JS to finish
+    page_timeout: 60         # seconds
+    include_patterns:
+      - "*/docs/*"
+      - "*/guide/*"
+    exclude_patterns:
+      - "*/api-reference/*"
+    skip_locale_duplicates: true
+    deduplicate_content: true
+
+  - url: https://blog.example.com
+    max_depth: 2
+    max_pages: 50
+    css_selector: article

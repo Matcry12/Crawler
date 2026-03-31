@@ -1,0 +1,22 @@
+[project]
+name = "crawl4ai-cli"
+version = "0.2.0"
+description = "Automated web crawler that outputs clean markdown for LLM consumption"
+requires-python = ">=3.11"
+dependencies = [
+    "crawl4ai>=0.8.0",
+    "typer>=0.9",
+    "rich>=13.0",
+    "pydantic>=2.0",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+crawl4ai-cli = "crawl4ai_cli.cli:app"
+
+[tool.setuptools]
+packages = ["crawl4ai_cli"]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
