@@ -1,0 +1,25 @@
+# Crawl config for course.shipwithai.io (Astro Starlight course site)
+output_dir: ./shipwithai-kb
+delay: 1.0
+concurrency: 3
+pruning_threshold: 0.30         # low threshold — preserve code-heavy content, avoid over-pruning
+markdown_format: fit
+min_word_count: 30
+max_retries: 2
+retry_delay: 3.0
+cache_mode: bypass               # fresh fetch every time (use 'enabled' for re-runs)
+
+sites:
+  - url: https://course.shipwithai.io/en/
+    max_depth: 100                 # deep enough for /en/section/phase/module/lesson
+    max_pages: 200               # 16 phases with multiple modules each
+    css_selector: main           # Starlight wraps content in <main>
+    wait_until: networkidle      # has JS components (theme, sidebar, web components)
+    page_timeout: 45
+    include_patterns:
+      - "*/en/*"                 # only English content
+    exclude_patterns:
+      - "*/vi/*"                 # skip Vietnamese duplicates
+    skip_locale_duplicates: true
+    deduplicate_content: true
+    domain_only: true

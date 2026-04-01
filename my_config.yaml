@@ -6,9 +6,9 @@ markdown_format: fit
 min_word_count: 30
 
 sites:
-  - url: https://platform.claude.com/docs/en/home
-    max_depth: 4
-    max_pages: 20
+  - url: https://course.shipwithai.io/en/
+    max_depth: 100
+    max_pages: 500
     css_selector: main             # most doc sites use <main> for content
     wait_until: domcontentloaded   # static sites don't need networkidle
     page_timeout: 30               # fast sites, short timeout

@@ -17,6 +17,8 @@ reddit-kb/
 knowledge-base/
 test_output/
 shipwithai_output/
+shipwithai-kb/
+claude-code-mastery/
 
 # Config with secrets
 .env

@@ -94,8 +94,31 @@ def _strip_orphan_links(text: str) -> str:
     return "\n".join(cleaned)
 
 
+def _strip_html_tags(text: str) -> str:
+    """Strip real HTML tags while preserving < in code blocks, comparisons, and heredocs."""
+    # Split by code fences to protect code blocks
+    parts = re.split(r"(```[\s\S]*?```|`[^`]+`)", text)
+    for i, part in enumerate(parts):
+        if part.startswith("`"):
+            continue  # skip code blocks
+        # Only strip known HTML tags, not arbitrary < usage
+        parts[i] = re.sub(
+            r"</?(?:div|span|p|br|hr|img|a|ul|ol|li|table|tr|td|th|thead|tbody"
+            r"|section|article|details|summary|figcaption|figure|iframe|script"
+            r"|style|link|meta|input|button|select|option|label|textarea"
+            r"|small|strong|em|b|i|u|s|sup|sub|mark|abbr|cite|code|pre"
+            r"|blockquote|dl|dt|dd|caption|col|colgroup|svg|path|rect|circle"
+            r"|noscript|picture|source|video|audio|canvas|embed|object"
+            r")(?:\s[^>]*)?\s*/?>",
+            "",
+            parts[i],
+            flags=re.IGNORECASE,
+        )
+    return "".join(parts)
+
+
 def clean_markdown(text: str) -> str:
-    text = re.sub(r"<[^>]+>", "", text)
+    text = _strip_html_tags(text)
     text = _strip_boilerplate_lines(text)
     text = _strip_orphan_links(text)
     text = re.sub(r"\n{4,}", "\n\n\n", text)
