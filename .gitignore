@@ -16,6 +16,7 @@ spa-kb/
 reddit-kb/
 knowledge-base/
 test_output/
+shipwithai_output/
 
 # Config with secrets
 .env
