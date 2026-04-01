@@ -153,7 +153,7 @@ async def _process_results(
     exclude_filter: ExcludePatternFilter | None,
     seen_urls: set[str],
     seen_hashes: set[str],
-    seen_locale_paths: set[str],
+    seen_locale_paths: dict[str, str],
 ) -> None:
     items = []
     if hasattr(results, "__aiter__"):
@@ -173,19 +173,25 @@ async def _process_results(
         # URL dedup
         if norm_url in seen_urls:
             stats.pages_skipped += 1
+            logger.debug("SKIP url-dedup: %s", url)
             continue
         seen_urls.add(norm_url)
 
-        # Locale dedup
+        # Locale dedup — only skip if the same canonical path was seen under a DIFFERENT locale
         if site.skip_locale_duplicates:
             parsed = urlparse(norm_url)
             canonical_path = _strip_locale_prefix(parsed.path)
-            locale_key = f"{parsed.netloc}{canonical_path}"
-            if locale_key in seen_locale_paths:
-                stats.pages_skipped += 1
-                logger.debug("Skipped locale duplicate: %s", url)
-                continue
-            seen_locale_paths.add(locale_key)
+            if canonical_path != parsed.path:  # URL actually has a locale prefix
+                locale_key = f"{parsed.netloc}{canonical_path}"
+                locale_match = LOCALE_PATTERN.match(parsed.path)
+                current_locale = locale_match.group(1) if locale_match else ""
+                stored = seen_locale_paths.get(locale_key)
+                if stored is not None and stored != current_locale:
+                    stats.pages_skipped += 1
+                    logger.debug("SKIP locale-dedup: %s (already have %s)", url, stored)
+                    continue
+                if stored is None:
+                    seen_locale_paths[locale_key] = current_locale
 
         if not result.success:
             stats.pages_failed += 1
@@ -196,6 +202,7 @@ async def _process_results(
 
         if exclude_filter and not exclude_filter.apply(url):
             stats.pages_skipped += 1
+            logger.debug("SKIP exclude-filter: %s", url)
             continue
 
         # Content dedup
@@ -205,9 +212,13 @@ async def _process_results(
                 h = content_hash(md_text)
                 if h in seen_hashes:
                     stats.pages_skipped += 1
-                    logger.debug("Skipped content duplicate: %s", url)
+                    logger.debug("SKIP content-dedup: %s (hash=%s)", url, h)
                     continue
                 seen_hashes.add(h)
+            else:
+                logger.debug("SKIP empty-markdown: %s", url)
+                stats.pages_skipped += 1
+                continue
 
         stats.pages_crawled += 1
         await on_result(result, site, depth, 0)
@@ -224,7 +235,7 @@ async def crawl_site(
     exclude_filter = ExcludePatternFilter(site.exclude_patterns) if site.exclude_patterns else None
     seen_urls: set[str] = set()
     seen_hashes: set[str] = set()
-    seen_locale_paths: set[str] = set()
+    seen_locale_paths: dict[str, str] = {}
 
     for attempt in range(1 + job.max_retries):
         try:
