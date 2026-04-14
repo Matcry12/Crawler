@@ -8,7 +8,10 @@ build/
 # Virtual environment
 .venv/
 
-# Crawl output
+# Crawl output (large KB directories)
+claude-kb/
+claude-kb-clean/
+claude-kb-clean.zip
 output/
 docs-kb/
 blog-kb/
@@ -19,6 +22,12 @@ test_output/
 shipwithai_output/
 shipwithai-kb/
 claude-code-mastery/
+
+# Temp retry/benchmark data
+retry_*.json
+benchmark_*.json
+test_sample_urls.json
+medium_expand_urls.json
 
 # Config with secrets
 .env

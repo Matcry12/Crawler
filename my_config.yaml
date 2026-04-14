@@ -1,24 +1,29 @@
-output_dir: ./docs-kb
-delay: 0.5
-concurrency: 5
-pruning_threshold: 0.48
+output_dir: ./reddit-kb
+delay: 3.0                         # polite delay to avoid bans
+concurrency: 1                     # single tab, sequential — safest for Reddit
+pruning_threshold: 0.30
 markdown_format: fit
 min_word_count: 30
+max_retries: 3
+retry_delay: 5.0
+stealth: true                      # random user-agent, simulate human, spoof navigator
 
 sites:
-  - url: https://course.shipwithai.io/en/
-    max_depth: 100
-    max_pages: 500
-    css_selector: main             # most doc sites use <main> for content
-    wait_until: domcontentloaded   # static sites don't need networkidle
-    page_timeout: 30               # fast sites, short timeout
+  # Crawl multiple sort views to discover more threads
+  # (Reddit lazy-loads the listing, so one page only finds ~6-8 threads)
+  - url: https://www.reddit.com/r/ClaudeAI/comments/1s8zxt4/thanks_to_the_leaked_source_code_for_claude_code/
+    max_depth: 1
+    max_pages: 30
+    css_selector: "[id='main-content']"
+    wait_until: domcontentloaded
+    page_timeout: 30
     include_patterns:
-      - "*/docs/*"
-      - "*/guide/*"
-      - "*/tutorial/*"
+      - "*/comments/*"
     exclude_patterns:
-      - "*/changelog/*"
-      - "*/api-reference/*"        # API refs are often auto-generated noise
-      - "*/_print/*"               # print-friendly duplicates
+      - "*/login*"
+      - "*/register*"
+      - "*/settings/*"
+      - "*/mod/*"
+      - "*/wiki/*"
     skip_locale_duplicates: true
     deduplicate_content: true
